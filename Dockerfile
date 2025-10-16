@@ -26,5 +26,3 @@ RUN npm install -g \
 # Возвращаем пользователя node (как требует n8n)
 USER node
 
-# Запускаем n8n
-CMD ["n8n", "start"]
