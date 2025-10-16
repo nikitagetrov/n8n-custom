@@ -1,40 +1,30 @@
-# Базовый образ
+# Базовый образ n8n (alpine)
 FROM n8nio/n8n:latest
 
-# Переключаемся на root для установки зависимостей
+# Переключаемся на root
 USER root
 
-# Устанавливаем системные зависимости для Puppeteer / Playwright
-RUN apt-get update && apt-get install -y \
+# Устанавливаем системные зависимости, нужные для Puppeteer (через apk)
+RUN apk add --no-cache \
+    chromium \
+    nss \
+    freetype \
+    harfbuzz \
     ca-certificates \
-    fonts-liberation \
-    libasound2 \
-    libatk-bridge2.0-0 \
-    libatk1.0-0 \
-    libcups2 \
-    libdrm2 \
-    libgbm1 \
-    libxcomposite1 \
-    libxdamage1 \
-    libxfixes3 \
-    libxrandr2 \
-    libxkbcommon0 \
-    libxshmfence1 \
-    libx11-xcb1 \
-    wget \
-    gnupg \
-    --no-install-recommends && \
-    rm -rf /var/lib/apt/lists/*
+    ttf-freefont \
+    nodejs \
+    npm
 
-# Устанавливаем Chromium (легковесный вариант)
-RUN apt-get update && apt-get install -y chromium
+# Указываем путь к chromium, чтобы Puppeteer его находил
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
 # Устанавливаем кастомные ноды глобально
-# (пример: puppeteer, proxy, telegram и т.д.)
 RUN npm install -g \
     n8n-nodes-puppeteer \
     n8n-nodes-puppeteer-extended
 
-# Меняем пользователя обратно
+# Возвращаем пользователя node (как требует n8n)
 USER node
 
+# Запускаем n8n
+CMD ["n8n", "start"]
